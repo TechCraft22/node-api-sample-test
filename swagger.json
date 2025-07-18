@@ -1,0 +1,291 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "AI Project API",
+    "version": "1.0.0",
+    "description": "Auto-generated Swagger API documentation"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000"
+    }
+  ],
+  "paths": {
+    "/greet": {
+      "get": {
+        "summary": "Greet a user",
+        "description": "Returns a greeting message with the provided name or \"world\" if no name is given.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "name",
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "description": "The name of the user to greet."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A greeting message."
+          },
+          "400": {
+            "description": "Invalid name parameter."
+          }
+        }
+      }
+    },
+    "/echo": {
+      "post": {
+        "summary": "Echo back the provided JSON data",
+        "description": "Returns the JSON data sent in the request body.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully echoed back the provided data.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "received": {
+                      "type": "object",
+                      "additionalProperties": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No data provided in the request body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "No data provided"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Please provide a JSON body in the request."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Check server health",
+        "description": "Returns the health status of the server.",
+        "responses": {
+          "200": {
+            "description": "Server is healthy.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "OK"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2025-07-18T12:15:31.195Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/status": {
+      "get": {
+        "summary": "Get server status",
+        "description": "Returns the server status, uptime, and current timestamp.",
+        "responses": {
+          "200": {
+            "description": "Server status information.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "Server is running"
+                    },
+                    "uptime": {
+                      "type": "number",
+                      "example": 123.45
+                    },
+                    "pretty": {
+                      "type": "string",
+                      "example": "2 minutes 3 seconds"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2025-07-18T12:15:31.195Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/version": {
+      "get": {
+        "summary": "Get API version",
+        "description": "Returns the API version and current timestamp.",
+        "responses": {
+          "200": {
+            "description": "API version information.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "version": {
+                      "type": "string",
+                      "example": "1.0.0"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2025-07-18T12:15:31.195Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/test-error-async": {
+      "get": {
+        "summary": "Test asynchronous error handling",
+        "description": "This endpoint is used to test asynchronous error handling in the application.",
+        "responses": {
+          "500": {
+            "description": "An error occurred while processing the request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Something went wrong!"
+                    },
+                    "handler": {
+                      "type": "string",
+                      "example": "Error Middleware"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/test-error": {
+      "get": {
+        "summary": "Test synchronous error handling",
+        "description": "This endpoint is used to test synchronous error handling in the application.",
+        "responses": {
+          "500": {
+            "description": "An error occurred while processing the request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Something went wrong!"
+                    },
+                    "handler": {
+                      "type": "string",
+                      "example": "Error Middleware"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Internal Server Error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/submit": {
+      "post": {
+        "summary": "Submit JSON data",
+        "description": "This endpoint receives JSON data and echoes it back.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully received the data.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "received": {
+                      "type": "object",
+                      "additionalProperties": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {},
+  "tags": []
+}
