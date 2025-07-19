@@ -5,7 +5,11 @@
   "type": "module",
   "scripts": {
     "start": "nodemon index",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "swagger": "swagger-jsdoc -d swaggerDef.js -o swagger.json"
   },
   "keywords": [],
   "author": "",
@@ -17,5 +21,10 @@
     "pretty-ms": "^9.2.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.54.1",
+    "jest": "^30.0.4",
+    "supertest": "^7.1.3"
   }
 }

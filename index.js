@@ -55,6 +55,8 @@ const swaggerOptions = {
     servers: [
       {
         url: `http://localhost:${PORT}`,
+        description: "Local server",
+        schema: "http", // Specify the protocol
       },
     ],
   },
@@ -63,6 +65,8 @@ const swaggerOptions = {
 
 // Generate swagger spec at runtime
 const swaggerSpec = swaggerJSDoc(swaggerOptions);
+
+
 
 // Serve the auto-generated Swagger JSON
 app.get("/swagger", (req, res) => {
