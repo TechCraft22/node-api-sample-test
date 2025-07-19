@@ -5,7 +5,10 @@
   "type": "module",
   "scripts": {
     "start": "nodemon index",
+    "build": "npm run test && npm run swagger",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:unit": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:e2e": "npx playwright test",
     "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
