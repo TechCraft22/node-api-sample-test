@@ -1,6 +1,11 @@
-import request from "supertest";
-import express from "express";
-import { describe, test, expect } from '@jest/globals';
+// import request from "supertest";
+// import express from "express";
+// import { describe, test, expect } from '@jest/globals';
+
+const request = require('supertest');
+const express = require('express');
+const { describe, test, expect } = require('@jest/globals');
+
 
 test('hello world!', () => {
 	expect(1 + 1).toBe(2);
@@ -146,7 +151,7 @@ describe("API Endpoints", () => {
 
     test("GET /version returns API version", async () => {
         const res = await request(app).get("/version");
-		console.log(res.body.timestamp, typeof res.body.timestamp);
+		//console.log(res.body.timestamp, typeof res.body.timestamp);
 
         expect(res.status).toBe(200);
         expect(res.body.version).toBe("1.0.0");

@@ -18,7 +18,9 @@ import swaggerUi from "swagger-ui-express";
 import swaggerJSDoc from "swagger-jsdoc";
 
 import prettyMs from "pretty-ms";
-import swaggerDocument from "./swagger.json" assert { type: "json" };
+//import swaggerDocument from "./swagger.json" assert { type: "json" };
+const swaggerPath = path.resolve('./swagger.json');
+const swaggerDocument = JSON.parse(fs.readFileSync(swaggerPath, 'utf8'));
 import { error } from "console";
 
 const app = express();
@@ -65,6 +67,7 @@ const swaggerOptions = {
 
 // Generate swagger spec at runtime
 const swaggerSpec = swaggerJSDoc(swaggerOptions);
+
 
 
 
