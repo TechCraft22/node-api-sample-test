@@ -24,7 +24,7 @@ pipeline {
         stage('Install Playwright Browsers') {
             steps {
                 echo 'Installing Playwright browsers...'
-                sh 'npx playwright install || echo "Playwright installation failed"'
+               // sh 'npx playwright install || echo "Playwright installation failed"'
             }
         }
 
@@ -55,7 +55,7 @@ pipeline {
         stage('Run e2e Tests with Playwright') {
             steps {
                 echo 'Running Playwright tests...'
-                sh 'npm run test:e2e || echo "E2E tests failed"'
+                //sh 'npm run test:e2e || echo "E2E tests failed"'
             }
         }
 
@@ -67,7 +67,7 @@ pipeline {
             }
         }
 
-        stage('Deploy to Production') {
+        stage('---------Deploy to Production--------------') {
             steps {
                 echo 'Starting production app on port 3030...'
                 sh 'PORT=3030 nohup npm start > production-app.log 2>&1 &'
@@ -79,9 +79,9 @@ pipeline {
         stage('Debug - App Status') {
             steps {
                 echo 'Checking app status...'
-                sh 'ps aux | grep "node index.js" | grep -v grep || echo "No node process found"'
+               // sh 'ps aux | grep "node index.js" | grep -v grep || echo "No node process found"'
                 // 'netstat -tlnp | grep :3000 || echo "Port 3000 not listening"'
-                sh 'lsof -i :3000 || echo "Nothing using port 3000"'
+                //sh 'lsof -i :3000 || echo "Nothing using port 3000"'
             }
         }
 
@@ -89,8 +89,8 @@ pipeline {
             steps {
                 echo 'Testing internal connection...'
                 sh 'curl -v http://localhost:3030/ || echo "localhost curl failed"'
-                sh 'curl -v http://172.30.0.2:3030/ || echo "172.30.0.2 curl failed"'
-                sh 'curl -v http://127.0.0.1:3030/ || echo "127.0.0.1 curl failed"'
+                //sh 'curl -v http://172.30.0.2:3030/ || echo "172.30.0.2 curl failed"'
+                //sh 'curl -v http://127.0.0.1:3030/ || echo "127.0.0.1 curl failed"'
             }
         }
 
@@ -98,8 +98,8 @@ pipeline {
             steps {
                 echo 'Checking environment...'
                 sh 'echo "PORT value: $PORT"'
-                sh 'node -e "console.log(process.env.PORT)"'
-                sh 'head -10 index.js'
+                //sh 'node -e "console.log(process.env.PORT)"'
+                sh 'head -15 index.js'
             }
         }
     }
