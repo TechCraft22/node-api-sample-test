@@ -24,7 +24,7 @@ pipeline {
         stage('Install Playwright Browsers') {
             steps {
                 echo 'Installing Playwright browsers...'
-                sh 'npx playwright install --with-deps || echo "Playwright installation failed"'
+                sh 'npx playwright install || echo "Playwright installation failed"'
             }
         }
 
