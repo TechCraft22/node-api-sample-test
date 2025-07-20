@@ -81,7 +81,7 @@ pipeline {
             }
         }
 
-        // NEW DOCKER STAGES
+        // IMPROVED DOCKER STAGES
         stage('Build Docker Image') {
             steps {
                 echo 'Building Docker image...'
@@ -109,34 +109,65 @@ pipeline {
                         // Run container in background for testing
                         sh "docker run -d --name test-container -p 3001:3000 ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}"
                         
-                        // Check if container is running
+                        // Check if container started
                         sh 'docker ps | grep test-container'
+                        echo "Container started successfully"
                         
-                        // Check container logs for debugging
-                        sh 'echo "=== Container Logs ==="'
-                        sh 'docker logs test-container || echo "No logs yet"'
+                        // Wait for application to be ready with proper health checking
+                        sh '''
+                            echo "Waiting for application to be ready..."
+                            for i in {1..12}; do
+                                echo "Health check attempt $i/12"
+                                sleep 5
+                                
+                                # Check if container is still running
+                                if ! docker ps | grep -q test-container; then
+                                    echo "Container stopped running!"
+                                    docker logs test-container
+                                    exit 1
+                                fi
+                                
+                                # Check container logs for server ready message
+                                if docker logs test-container 2>&1 | grep -q "Server is running"; then
+                                    echo "Server is ready according to logs"
+                                    
+                                    # Test connectivity
+                                    if curl -f -s -m 10 http://localhost:3001 > /dev/null; then
+                                        echo "✅ Health check passed!"
+                                        curl -v http://localhost:3001
+                                        break
+                                    else
+                                        echo "Server ready but curl failed, checking network..."
+                                        docker exec test-container netstat -tlnp | grep :3000 || echo "Port 3000 not listening"
+                                    fi
+                                fi
+                                
+                                if [ $i -eq 12 ]; then
+                                    echo "❌ Health check failed after 60 seconds"
+                                    echo "=== Final Container Logs ==="
+                                    docker logs test-container
+                                    echo "=== Container Processes ==="
+                                    docker exec test-container ps aux
+                                    echo "=== Network Status ==="
+                                    docker exec test-container netstat -tlnp
+                                    echo "=== Container Inspect ==="
+                                    docker inspect test-container
+                                    exit 1
+                                fi
+                            done
+                        '''
                         
-                        // Wait longer for container to start
-                        sh 'sleep 15'
-                        
-                        // Check logs again
-                        sh 'echo "=== Container Logs After Wait ==="'
-                        sh 'docker logs test-container'
-                        
-                        // Check if container is still running
-                        sh 'docker ps | grep test-container || echo "Container not running!"'
-                        
-                        // Test the container with more detailed error output
-                        sh 'curl -v http://localhost:3001 || echo "Curl failed - container may not be responding"'
-                        
-                        // Additional health checks
-                        sh 'docker exec test-container ps aux || echo "Cannot execute in container"'
-                        sh 'docker exec test-container netstat -tlnp || echo "Cannot check ports"'
+                        echo "Docker image test completed successfully!"
                         
                     } catch (Exception e) {
                         echo "Docker test failed: ${e.getMessage()}"
-                        // Show container logs for debugging
-                        sh 'docker logs test-container || echo "No container logs available"'
+                        // Show comprehensive debugging info
+                        sh '''
+                            echo "=== Debugging Docker Test Failure ==="
+                            docker logs test-container || echo "No container logs available"
+                            docker ps -a | grep test-container || echo "No container found"
+                            docker inspect test-container || echo "Cannot inspect container"
+                        '''
                         throw e
                     } finally {
                         // Always clean up test container
@@ -191,10 +222,48 @@ pipeline {
                         ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}
                     """
                     
-                    // Wait and test
-                    sh 'sleep 15'
-                    sh 'docker logs production-app'
-                    sh 'curl -f http://localhost:3000 && echo "Production deployment successful!"'
+                    // Proper health check for production
+                    sh '''
+                        echo "Verifying production deployment..."
+                        for i in {1..12}; do
+                            echo "Production health check $i/12"
+                            sleep 5
+                            
+                            # Check if container is running
+                            if ! docker ps | grep -q production-app; then
+                                echo "Production container stopped!"
+                                docker logs production-app
+                                exit 1
+                            fi
+                            
+                            # Check if server is ready in logs first
+                            if docker logs production-app 2>&1 | grep -q "Server is running"; then
+                                echo "Server is ready according to logs"
+                                
+                                # Test production endpoint
+                                if curl -f -s -m 10 http://localhost:3000 > /dev/null; then
+                                    echo "✅ Production deployment successful!"
+                                    curl -v http://localhost:3000
+                                    echo "Application is accessible at http://localhost:3000"
+                                    break
+                                else
+                                    echo "Server ready but curl failed, checking network..."
+                                    docker exec production-app netstat -tlnp | grep :3000 || echo "Port 3000 not listening"
+                                fi
+                            fi
+                            
+                            if [ $i -eq 12 ]; then
+                                echo "❌ Production health check failed after 60 seconds"
+                                echo "=== Production Container Logs ==="
+                                docker logs production-app
+                                echo "=== Production Container Status ==="
+                                docker ps | grep production-app || echo "Container not running"
+                                echo "=== Network Status ==="
+                                docker exec production-app netstat -tlnp || echo "Cannot check network"
+                                exit 1
+                            fi
+                        done
+                    '''
                 }
             }
         }
@@ -238,6 +307,8 @@ pipeline {
                      
                      Docker Image: ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}
                      Docker Hub: https://hub.docker.com/r/${DOCKER_IMAGE_NAME}
+                     
+                     Application is running at: http://localhost:3000
                      
                      Check logs at ${env.BUILD_URL}
                  """
