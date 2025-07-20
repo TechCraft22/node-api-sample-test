@@ -155,14 +155,14 @@ pipeline {
                     sh """
                         docker run -d \
                         --name production-app \
-                        -p 3030:3000 \
+                        -p 3000:3000 \
                         --restart unless-stopped \
                         ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}
                     """
                     
                     // Wait and test
                     sh 'sleep 10'
-                    sh 'curl -f http://localhost:3030 && echo "Production deployment successful!"'
+                    sh 'curl -f http://localhost:3000 && echo "Production deployment successful!"'
                 }
             }
         }

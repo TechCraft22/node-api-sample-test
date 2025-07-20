@@ -12,14 +12,19 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install production dependencies only
-RUN npm ci --only --production
+RUN npm ci --only=production
 
 # Remove test directories and files
 # RUN rm -rf tests/ test/ __tests__/ *.test.js *.spec.js playwright.config.js jest.config.js *.log
 
 COPY . .
 
-EXPOSE 3030
+# Set environment variables
+ENV NODE_ENV=production
+ENV PORT=3000
+
+# Expose the port the app runs on
+EXPOSE 3000
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs && \
