@@ -6,6 +6,7 @@ pipeline {
     }
 
     stages {
+        
         stage('Checkout') {
             steps {
                 echo 'Pulling code from GitHub master branch...'
@@ -17,6 +18,13 @@ pipeline {
             steps {
                 echo 'Installing npm dependencies...'
                 sh 'npm install'
+            }
+        }
+
+        stage('Install Playwright Browsers') {
+            steps {
+                echo 'Installing Playwright browsers...'
+                sh 'npx playwright install --with-deps || echo "Playwright installation failed'
             }
         }
 
@@ -72,7 +80,7 @@ pipeline {
             steps {
                 echo 'Checking app status...'
                 sh 'ps aux | grep "node index.js" | grep -v grep || echo "No node process found"'
-                sh 'netstat -tlnp | grep :3000 || echo "Port 3000 not listening"'
+                // 'netstat -tlnp | grep :3000 || echo "Port 3000 not listening"'
                 sh 'lsof -i :3000 || echo "Nothing using port 3000"'
             }
         }
@@ -80,9 +88,9 @@ pipeline {
         stage('Debug - Test Connection') {
             steps {
                 echo 'Testing internal connection...'
-                sh 'curl -v http://localhost:3000/ || echo "localhost curl failed"'
-                sh 'curl -v http://0.0.0.0:3000/ || echo "0.0.0.0 curl failed"'
-                sh 'curl -v http://127.0.0.1:3000/ || echo "127.0.0.1 curl failed"'
+                sh 'curl -v http://localhost:3030/ || echo "localhost curl failed"'
+                sh 'curl -v http://172.30.0.2:3030/ || echo "172.30.0.2 curl failed"'
+                sh 'curl -v http://127.0.0.1:3030/ || echo "127.0.0.1 curl failed"'
             }
         }
 
