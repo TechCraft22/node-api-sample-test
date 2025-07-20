@@ -109,6 +109,6 @@ pipeline {
         failure {
             echo '---####----Pipeline failed! Cleaning up...----###----'
             sh 'pkill -f "node index.js" || echo "Cleanup done"'
-        }
+        }        
     }
 }
