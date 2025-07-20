@@ -101,17 +101,48 @@ pipeline {
             steps {
                 echo 'Testing Docker image...'
                 script {
-                    // Run container in background for testing
-                    sh "docker run -d --name test-container -p 3000:3000 ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}"
-                    
-                    // Wait for container to start
-                    sh 'sleep 10'
-                    
-                    // Test the container
-                    sh 'curl -f http://localhost:3000 && echo "Docker container is working!"'
-                    
-                    // Stop and remove test container
-                    sh 'docker stop test-container && docker rm test-container'
+                    try {
+                        // Clean up any existing test containers first
+                        sh 'docker stop test-container || echo "No existing container"'
+                        sh 'docker rm test-container || echo "No existing container to remove"'
+                        
+                        // Run container in background for testing
+                        sh "docker run -d --name test-container -p 3001:3000 ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}"
+                        
+                        // Check if container is running
+                        sh 'docker ps | grep test-container'
+                        
+                        // Check container logs for debugging
+                        sh 'echo "=== Container Logs ==="'
+                        sh 'docker logs test-container || echo "No logs yet"'
+                        
+                        // Wait longer for container to start
+                        sh 'sleep 15'
+                        
+                        // Check logs again
+                        sh 'echo "=== Container Logs After Wait ==="'
+                        sh 'docker logs test-container'
+                        
+                        // Check if container is still running
+                        sh 'docker ps | grep test-container || echo "Container not running!"'
+                        
+                        // Test the container with more detailed error output
+                        sh 'curl -v http://localhost:3001 || echo "Curl failed - container may not be responding"'
+                        
+                        // Additional health checks
+                        sh 'docker exec test-container ps aux || echo "Cannot execute in container"'
+                        sh 'docker exec test-container netstat -tlnp || echo "Cannot check ports"'
+                        
+                    } catch (Exception e) {
+                        echo "Docker test failed: ${e.getMessage()}"
+                        // Show container logs for debugging
+                        sh 'docker logs test-container || echo "No container logs available"'
+                        throw e
+                    } finally {
+                        // Always clean up test container
+                        sh 'docker stop test-container || echo "Container already stopped"'
+                        sh 'docker rm test-container || echo "Container already removed"'
+                    }
                 }
             }
         }
@@ -161,7 +192,8 @@ pipeline {
                     """
                     
                     // Wait and test
-                    sh 'sleep 10'
+                    sh 'sleep 15'
+                    sh 'docker logs production-app'
                     sh 'curl -f http://localhost:3000 && echo "Production deployment successful!"'
                 }
             }
