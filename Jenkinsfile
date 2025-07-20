@@ -107,7 +107,7 @@ pipeline {
                         sh 'docker rm test-container || echo "No existing container to remove"'
                         
                         // Run container in background for testing
-                        sh "docker run -d --name test-container -p 3001:3000 ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}"
+                        sh "docker run -d --name test-container -p 3000:3000 ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}"
                         
                         // Check if container is running
                         sh 'docker ps | grep test-container'
@@ -127,7 +127,7 @@ pipeline {
                         sh 'docker ps | grep test-container || echo "Container not running!"'
                         
                         // Test the container with more detailed error output
-                        sh 'curl -v http://localhost:3001 || echo "Curl failed - container may not be responding"'
+                        sh 'curl -v http://localhost:3000 || echo "Curl failed - container may not be responding"'
                         
                         // Additional health checks
                         sh 'docker exec test-container ps aux || echo "Cannot execute in container"'
