@@ -6,7 +6,7 @@ pipeline {
     }
 
     stages {
-        
+
         stage('Checkout') {
             steps {
                 echo 'Pulling code from GitHub master branch...'
@@ -24,7 +24,7 @@ pipeline {
         stage('Install Playwright Browsers') {
             steps {
                 echo 'Installing Playwright browsers...'
-                sh 'npx playwright install --with-deps || echo "Playwright installation failed'
+                sh 'npx playwright install --with-deps || echo "Playwright installation failed"'
             }
         }
 
