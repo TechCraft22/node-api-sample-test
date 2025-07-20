@@ -102,13 +102,13 @@ pipeline {
                 echo 'Testing Docker image...'
                 script {
                     // Run container in background for testing
-                    sh "docker run -d --name test-container -p 3001:3000 ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}"
+                    sh "docker run -d --name test-container -p 3000:3000 ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}"
                     
                     // Wait for container to start
                     sh 'sleep 10'
                     
                     // Test the container
-                    sh 'curl -f http://localhost:3001 && echo "Docker container is working!"'
+                    sh 'curl -f http://localhost:3000 && echo "Docker container is working!"'
                     
                     // Stop and remove test container
                     sh 'docker stop test-container && docker rm test-container'
