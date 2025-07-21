@@ -113,6 +113,10 @@ pipeline {
                         sh 'docker ps | grep test-container'
                         echo "Container started successfully"
                         
+                        // Get container IP
+                        CONTAINER_IP=$(docker inspect test-container -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}')
+                        echo "Container IP: $CONTAINER_IP"
+
                         // Wait for application to be ready with proper health checking
                         sh '''
                             echo "Waiting for application to be ready..."
@@ -132,9 +136,9 @@ pipeline {
                                     echo "Server is ready according to logs"
                                     
                                     # Test connectivity
-                                    if curl -f -s -m 10 http://localhost:3001 > /dev/null; then
+                                    if curl -f -s -m 10 http://$CONTAINER_IP:3001 > /dev/null; then
                                         echo "✅ Health check passed!"
-                                        curl -v http://localhost:3001
+                                        curl -v http://$CONTAINER_IP:3001
                                         break
                                     else
                                         echo "Server ready but curl failed, checking network..."
@@ -225,6 +229,10 @@ pipeline {
                     sh 'docker stop production-app || echo "No existing container"'
                     sh 'docker rm production-app || echo "No existing container to remove"'
                     
+                    // Get container IP
+                        CONTAINER_IP=$(docker inspect test-container -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}')
+                        echo "Container IP: $CONTAINER_IP"
+
                     // Run new production container
                     sh """
                         docker run -d \
@@ -254,10 +262,10 @@ pipeline {
                                 echo "Server is ready according to logs"
                                 
                                 # Test production endpoint
-                                if curl -f -s -m 10 http://localhost:3000 > /dev/null; then
+                                if curl -f -s -m 10 http://$CONTAINER_IP:3000 > /dev/null; then
                                     echo "✅ Production deployment successful!"
-                                    curl -v http://localhost:3000
-                                    echo "Application is accessible at http://localhost:3000"
+                                    curl -v http://$CONTAINER_IP:3000
+                                    echo "Application is accessible at http://$CONTAINER_IP:3000"
                                     break
                                 else
                                     echo "Server ready but curl failed, checking network..."
