@@ -178,10 +178,22 @@ pipeline {
             }
         }
 
+        stage('Detect Branch') {
+            steps {
+                script {
+                    def branch = sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
+                    echo "Git branch detected: ${branch}"
+                }
+            }
+        }
+
         stage('Push to Docker Hub') {
             when {
                 // Only push on successful builds from master branch
-                branch 'master'
+                expression {
+                    def branch = sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
+                    return branch == 'master'
+                }
             }
             steps {
                 echo 'Pushing Docker image to Docker Hub...'
@@ -225,7 +237,7 @@ pipeline {
                     // Proper health check for production
                     sh '''
                         echo "Verifying production deployment..."
-                        for i in {1..12}; do
+                        for i in $(seq 1 12); do
                             echo "Production health check $i/12"
                             sleep 5
                             
