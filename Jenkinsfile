@@ -112,9 +112,13 @@ pipeline {
                         // Check if container started
                         sh 'docker ps | grep test-container'
                         echo "Container started successfully"
+                        sh '''
+                            CONTAINER_IP=$(docker inspect test-container -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}")
+                            echo "Container IP: $CONTAINER_IP"
+                        '''
                         
                         // Get container IP
-                        CONTAINER_IP=$(docker inspect test-container -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}')
+                        //CONTAINER_IP=\$(docker inspect test-container -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}')
                         echo "Container IP: $CONTAINER_IP"
 
                         // Wait for application to be ready with proper health checking
@@ -229,9 +233,14 @@ pipeline {
                     sh 'docker stop production-app || echo "No existing container"'
                     sh 'docker rm production-app || echo "No existing container to remove"'
                     
-                    // Get container IP
-                        CONTAINER_IP=$(docker inspect test-container -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}')
+                    sh '''
+                        CONTAINER_IP=$(docker inspect test-container -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}")
                         echo "Container IP: $CONTAINER_IP"
+                    '''
+
+                    // Get container IP
+                        //CONTAINER_IP=$(docker inspect test-container -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}')
+                        //echo "Container IP: $CONTAINER_IP"
 
                     // Run new production container
                     sh """
