@@ -107,7 +107,7 @@ pipeline {
                         sh 'docker rm test-container || echo "No existing container to remove"'
                         
                         // Run container in background for testing
-                        sh "docker run -d --name test-container -p 3001:3000 ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}"
+                        sh "docker run -d --name test-container -p 3001:3000 --network jenkinks_jenkins-net ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}"
                         
                         // Check if container started
                         sh 'docker ps | grep test-container'
@@ -116,7 +116,7 @@ pipeline {
                         // Wait for application to be ready with proper health checking
                         sh '''
                             echo "Waiting for application to be ready..."
-                            for i in {1..12}; do
+                            for i in $(seq 1 3); do
                                 echo "Health check attempt $i/12"
                                 sleep 5
                                 
@@ -128,7 +128,7 @@ pipeline {
                                 fi
                                 
                                 # Check container logs for server ready message
-                                if docker logs test-container 2>&1 | grep -q "Server is running"; then
+                               ## if docker logs test-container 2>&1 | grep -q "Server is running"; then
                                     echo "Server is ready according to logs"
                                     
                                     # Test connectivity
@@ -140,10 +140,10 @@ pipeline {
                                         echo "Server ready but curl failed, checking network..."
                                         docker exec test-container netstat -tlnp | grep :3000 || echo "Port 3000 not listening"
                                     fi
-                                fi
+                               ## fi
                                 
-                                if [ $i -eq 12 ]; then
-                                    echo "❌ Health check failed after 60 seconds"
+                                if [ $i -eq 3 ]; then
+                                    echo "❌ Health check failed after 15 seconds"
                                     echo "=== Final Container Logs ==="
                                     docker logs test-container
                                     echo "=== Container Processes ==="
@@ -229,7 +229,7 @@ pipeline {
                     sh """
                         docker run -d \
                         --name production-app \
-                        --network jenkink_jenkins-net \
+                        --network jenkinks_jenkins-net \
                         -p 3000:3000 \
                         --restart unless-stopped \
                         ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}
