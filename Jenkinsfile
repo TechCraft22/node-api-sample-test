@@ -107,7 +107,7 @@ pipeline {
                         sh 'docker rm test-container || echo "No existing container to remove"'
                         
                         // Run container in background for testing
-                        sh "docker run -d --name test-container -p 3001:3000 --network jenkinks_jenkins-net ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}"
+                        sh "docker run -d --name test-container -p 3001:3000 --network jenkins_jenkins-net ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}"
                         
                         // Check if container started
                         sh 'docker ps | grep test-container'
@@ -229,7 +229,7 @@ pipeline {
                     sh """
                         docker run -d \
                         --name production-app \
-                        --network jenkinks_jenkins-net \
+                        --network jenkins_jenkins-net \
                         -p 3000:3000 \
                         --restart unless-stopped \
                         ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}
