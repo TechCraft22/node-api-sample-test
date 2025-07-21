@@ -229,6 +229,7 @@ pipeline {
                     sh """
                         docker run -d \
                         --name production-app \
+                        --network jenkink_jenkins-net \
                         -p 3000:3000 \
                         --restart unless-stopped \
                         ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}
@@ -249,7 +250,7 @@ pipeline {
                             fi
                             
                             # Check if server is ready in logs first
-                            if docker logs production-app 2>&1 | tail -n 100 | grep -qi "Server is running"; then
+                            #if docker logs production-app 2>&1 | tail -n 100 | grep -qi "Server is running"; then
                                 echo "Server is ready according to logs"
                                 
                                 # Test production endpoint
@@ -262,7 +263,7 @@ pipeline {
                                     echo "Server ready but curl failed, checking network..."
                                     docker exec production-app netstat -tlnp | grep :3000 || echo "Port 3000 not listening"
                                 fi
-                            fi
+                            #fi
                             
                             if [ $i -eq 12 ]; then
                                 echo "❌ Production health check failed after 60 seconds"
