@@ -211,20 +211,7 @@ pipeline {
                 }
             }
         }
-
-        stage('Cleanup Docker Images') {
-            steps {
-                echo 'Cleaning up old Docker images...'
-                script {
-                    // Keep last 3 images, remove older ones
-                    sh """
-                        docker images ${DOCKER_IMAGE_NAME} --format "table {{.Tag}}" | \
-                        grep -E '^[0-9]+\$' | sort -nr | tail -n +4 | \
-                        xargs -I {} docker rmi ${DOCKER_IMAGE_NAME}:{} || echo "No old images to remove"
-                    """
-                }
-            }
-        }
+        
 
         stage('Debug - Environment') {
             steps {
