@@ -144,14 +144,9 @@ pipeline {
                     // Stop existing production container if running
                     sh 'docker stop production-app || echo "No existing container"'
                     sh 'docker rm production-app || echo "No existing container to remove"'
-                    
-                    sh '''
-                        CONTAINER_IP=$(docker inspect test-container -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}")
-                        echo "Container IP: $CONTAINER_IP"
-                    '''
-
+                   
                     // Get container IP
-                        //CONTAINER_IP=$(docker inspect test-container -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}')
+                        //CONTAINER_IP=$(docker inspect production-app -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}')
                         //echo "Container IP: $CONTAINER_IP"
 
                     // Run new production container
@@ -170,7 +165,7 @@ pipeline {
                         for i in $(seq 1 3); do
                             echo "Production health check $i/12"
                             sleep 5
-                            CONTAINER_IP=$(docker inspect test-container -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}")
+                            CONTAINER_IP=$(docker inspect production-app -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}")
                             echo "Container IP: $CONTAINER_IP"
                             
                             # Check if container is running
@@ -227,8 +222,8 @@ pipeline {
         always {
             echo '##### Pipeline completed! #####'
             // Clean up any test containers
-            sh 'docker stop test-container || echo "No test container to stop"'
-            sh 'docker rm test-container || echo "No test container to remove"'
+          //  sh 'docker stop test-container || echo "No test container to stop"'
+           // sh 'docker rm test-container || echo "No test container to remove"'
         }
         success {
             mail to: 'dev@localhost',
