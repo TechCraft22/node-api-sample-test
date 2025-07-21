@@ -111,15 +111,11 @@ pipeline {
                         
                         // Check if container started
                         sh 'docker ps | grep test-container'
-                        echo "Container started successfully"
-                        sh '''
-                            CONTAINER_IP=$(docker inspect test-container -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}")
-                            echo "Container IP: $CONTAINER_IP"
-                        '''
+                        echo "Container started successfully"                        
                         
                         // Get container IP
                         //CONTAINER_IP=\$(docker inspect test-container -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}')
-                        echo "Container IP: $CONTAINER_IP"
+                        //echo "Container IP: $CONTAINER_IP"
 
                         // Wait for application to be ready with proper health checking
                         sh '''
@@ -127,6 +123,8 @@ pipeline {
                             for i in $(seq 1 3); do
                                 echo "Health check attempt $i/12"
                                 sleep 5
+                                CONTAINER_IP=$(docker inspect test-container -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}")
+                                echo "Container IP: $CONTAINER_IP"
                                 
                                 # Check if container is still running
                                 if ! docker ps | grep -q test-container; then
@@ -255,9 +253,11 @@ pipeline {
                     // Proper health check for production
                     sh '''
                         echo "Verifying production deployment..."
-                        for i in $(seq 1 12); do
+                        for i in $(seq 1 3); do
                             echo "Production health check $i/12"
                             sleep 5
+                            CONTAINER_IP=$(docker inspect test-container -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}")
+                            echo "Container IP: $CONTAINER_IP"
                             
                             # Check if container is running
                             if ! docker ps | grep -q production-app; then
@@ -282,7 +282,7 @@ pipeline {
                                 fi
                             #fi
                             
-                            if [ $i -eq 12 ]; then
+                            if [ $i -eq 3 ]; then
                                 echo "❌ Production health check failed after 60 seconds"
                                 echo "=== Production Container Logs ==="
                                 docker logs production-app
