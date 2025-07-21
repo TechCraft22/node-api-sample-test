@@ -516,7 +516,8 @@ app.use((err, req, res, next) => {
   });
 });
 
-//start the server
-app.listen(PORT, () => {
+//start the server - define the v4Ip placeholder 
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on port http://localhost:${PORT}`);
 });
+
