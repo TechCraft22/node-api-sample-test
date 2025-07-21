@@ -249,7 +249,7 @@ pipeline {
                             fi
                             
                             # Check if server is ready in logs first
-                            if docker logs production-app 2>&1 | grep -q "Server is running"; then
+                            if docker logs production-app 2>&1 | tail -n 100 | grep -qi "Server is running"; then
                                 echo "Server is ready according to logs"
                                 
                                 # Test production endpoint
